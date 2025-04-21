@@ -108,7 +108,7 @@ st.markdown("**Fields marked with * are required**")
 
 # --- Pet Info Inputs ---
 # Gender *
-gender = st.radio("Gender *", ["Male", "Female"], key="gender")
+gender = st.radio("Gender *", ["Male", "Female"], index=None, key="gender")
 
 # Species *
 species = st.selectbox("Species *", ["-- Select Species --", "Dog", "Cat"], key="species")
@@ -128,7 +128,7 @@ body_score = st.slider("Body Score (1-9)", min_value=1, max_value=9, key="body_s
 
 st.markdown("---")
 
-# --- Health Conditions (no form to allow dynamic filtering) ---
+# --- Health Conditions (dynamic filtering) ---
 st.subheader("Health Conditions")
 # Main Health Issue *
 main_issue = st.selectbox(
@@ -154,13 +154,13 @@ other_issue_2 = st.selectbox(
 st.markdown("---")
 
 # Allergies *
-has_allergy = st.radio("Allergies *", ["Yes", "No"], key="has_allergy")
+has_allergy = st.radio("Allergies *", ["Yes", "No"], index=None, key="has_allergy")
 selected_allergies = st.multiselect("Select Allergies", allergy_list, key="allergies") if has_allergy == "Yes" else []
 
 # Pregnancy/Lactation (Female only)
 if gender == "Female":
-    pregnant = st.radio("Pregnant *", ["Yes", "No"], key="pregnant")
-    lactating = st.radio("Lactating *", ["Yes", "No"], key="lactating")
+    pregnant = st.radio("Pregnant *", ["Yes", "No"], index=None, key="pregnant")
+    lactating = st.radio("Lactating *", ["Yes", "No"], index=None, key="lactating")
 else:
     pregnant = None
     lactating = None
