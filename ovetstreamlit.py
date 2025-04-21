@@ -103,11 +103,39 @@ life_stages = ["Growth", "Adult", "Senior"]
 st.set_page_config(page_title="Pet Nutrition Recommender", layout="centered")
 st.title("🐾 Pet Nutrition Recommendation Tool")
 
+# Custom CSS for scrollbar and error styling
+st.markdown("""
+    <style>
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 6px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Error message styling */
+    .stError {
+        background-color: #f8d7da !important;
+        color: #721c24 !important;
+        border: 1px solid #f5c6cb !important;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Required fields note
 st.markdown("**Fields marked with * are required**")
 
-# --- Pet Info Inputs ---
-# Gender *
 gender = st.radio("Gender *", ["Male", "Female"], index=None, key="gender")
 
 # Species *
