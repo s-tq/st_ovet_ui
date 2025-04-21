@@ -103,119 +103,92 @@ life_stages = ["Growth", "Adult", "Senior"]
 st.set_page_config(page_title="Pet Nutrition Recommender", layout="centered")
 st.title("🐾 Pet Nutrition Recommendation Tool")
 
-# Required Fields Indicator
+# Required fields note
 st.markdown("**Fields marked with * are required**")
 
+# --- Pet Info Inputs ---
 # Gender *
-gender = st.radio("Gender *", options=["Male", "Female"], key="gender")
+gender = st.radio("Gender *", ["Male", "Female"], key="gender")
 
-# Species * & Breed *
+# Species *
 species = st.selectbox("Species *", ["-- Select Species --", "Dog", "Cat"], key="species")
+# Breed *
 breed_list = dog_breeds if species == "Dog" else (cat_breeds if species == "Cat" else [])
 breed = st.selectbox("Breed *", ["-- Select Breed --"] + breed_list, key="breed") if breed_list else None
 
+# Breed Size *, Life Stage *, Activity Level *
+breed_size = st.selectbox("Breed Size *", ["-- Select Breed Size --", "Small", "Medium", "Large"], key="breed_size")
+life_stage = st.selectbox("Life Stage *", ["-- Select Life Stage --"] + life_stages, key="life_stage")
+activity_level = st.selectbox("Activity Level *", ["-- Select Activity Level --"] + activity_levels, key="activity_level")
+
+# Weight, Age, Body Score
+weight = st.number_input("Weight (kg)", min_value=0.0, step=0.1, key="weight")
+age = st.number_input("Age (months)", min_value=0, step=1, key="age")
+body_score = st.slider("Body Score (1-9)", min_value=1, max_value=9, key="body_score")
+
 st.markdown("---")
 
-with st.form("pet_form"):
-    # Breed Size *, Life Stage *, Activity Level *
-    breed_size = st.selectbox("Breed Size *", ["-- Select Breed Size --", "Small", "Medium", "Large"], key="breed_size")
-    life_stage = st.selectbox("Life Stage *", ["-- Select Life Stage --"] + life_stages, key="life_stage")
-    activity_level = st.selectbox("Activity Level *", ["-- Select Activity Level --"] + activity_levels, key="activity_level")
+# --- Health Conditions (no form to allow dynamic filtering) ---
+st.subheader("Health Conditions")
+# Main Health Issue *
+main_issue = st.selectbox(
+    "Main Health Issue *",
+    ["-- None --"] + health_issues,
+    key="main_issue"
+)
+# Other Health Issue 1 (exclude main)
+other_opts1 = [h for h in health_issues if h != main_issue]
+other_issue_1 = st.selectbox(
+    "Other Health Issue 1",
+    ["-- None --"] + other_opts1,
+    key="other_issue_1"
+)
+# Other Health Issue 2 (exclude main and issue 1)
+other_opts2 = [h for h in health_issues if h not in {main_issue, other_issue_1}]
+other_issue_2 = st.selectbox(
+    "Other Health Issue 2",
+    ["-- None --"] + other_opts2,
+    key="other_issue_2"
+)
 
-    weight = st.number_input("Weight (kg)", min_value=0.0, step=0.1, value=0.0, key="weight")
-    age = st.number_input("Age (months)", min_value=0, step=1, value=0, key="age")
-    body_score = st.slider("Body Score (1-9)", min_value=1, max_value=9, step=1, key="body_score")
+st.markdown("---")
 
-    # Health Conditions
-    st.subheader("Health Conditions")
-    main_issue = st.selectbox(
-        "Main Health Issue *",
-        ["-- Select Main Health Issue --"] + health_issues,
-        key="main_issue"
-    )
-    # Exclude main from other options
-    other_opts = [issue for issue in health_issues if issue != main_issue]
-    col1, col2 = st.columns(2)
-    with col1:
-        other_issue_1 = st.selectbox(
-            "Other Health Issue 1",
-            ["-- None --"] + other_opts,
-            key="other_issue_1"
-        )
-    # Exclude main and other1
-    other_opts2 = [issue for issue in health_issues if issue not in {main_issue, other_issue_1}]
-    with col2:
-        other_issue_2 = st.selectbox(
-            "Other Health Issue 2",
-            ["-- None --"] + other_opts2,
-            key="other_issue_2"
-        )
+# Allergies *
+has_allergy = st.radio("Allergies *", ["Yes", "No"], key="has_allergy")
+selected_allergies = st.multiselect("Select Allergies", allergy_list, key="allergies") if has_allergy == "Yes" else []
 
-    # Allergies *
-    has_allergy = st.radio("Allergies *", options=["Yes", "No"], key="has_allergy")
-    selected_allergies = []
-    if has_allergy == "Yes":
-        selected_allergies = st.multiselect("Select Allergies", allergy_list, key="allergies")
+# Pregnancy/Lactation (Female only)
+if gender == "Female":
+    pregnant = st.radio("Pregnant *", ["Yes", "No"], key="pregnant")
+    lactating = st.radio("Lactating *", ["Yes", "No"], key="lactating")
+else:
+    pregnant = None
+    lactating = None
 
-    # Pregnancy / Lactation (only for Female)
-    if gender == "Female":
-        pregnant = st.radio("Pregnant *", options=["Yes", "No"], key="pregnant")
-        lactating = st.radio("Lactating *", options=["Yes", "No"], key="lactating")
-    else:
-        pregnant = None
-        lactating = None
+st.markdown("---")
 
-    submit = st.form_submit_button("Get Recommendations")
-
-if submit:
+# Submit button
+if st.button("Get Recommendations"):
     errors = []
     # Validate required fields
-    if species.startswith("--"):
-        errors.append("Species is required.")
-    if breed.startswith("--"):
-        errors.append("Breed is required.")
-    if breed_size.startswith("--"):
-        errors.append("Breed size is required.")
-    if life_stage.startswith("--"):
-        errors.append("Life stage is required.")
-    if activity_level.startswith("--"):
-        errors.append("Activity level is required.")
-    if main_issue.startswith("--"):
-        errors.append("Main health issue is required.")
-
+    if species.startswith("--"): errors.append("Species is required.")
+    if breed is None or breed.startswith("--"): errors.append("Breed is required.")
+    if breed_size.startswith("--"): errors.append("Breed size is required.")
+    if life_stage.startswith("--"): errors.append("Life stage is required.")
+    if activity_level.startswith("--"): errors.append("Activity level is required.")
+    if main_issue.startswith("--"): errors.append("Main health issue is required.")
     # Enforce uniqueness
     if other_issue_1 != "-- None --" and other_issue_1 == main_issue:
-        errors.append("Other Health Issue 1 cannot match the main health issue.")
-    if other_issue_2 != "-- None --" and other_issue_2 == main_issue:
-        errors.append("Other Health Issue 2 cannot match the main health issue.")
-    if other_issue_1 != "-- None --" and other_issue_2 != "-- None --" and other_issue_1 == other_issue_2:
-        errors.append("Other health issues must be different from each other.")
-
+        errors.append("Other Health Issue 1 cannot equal the main issue.")
+    if other_issue_2 != "-- None --" and (other_issue_2 == main_issue or other_issue_2 == other_issue_1):
+        errors.append("Other Health Issue 2 must be different from main and issue 1.")
     if has_allergy == "Yes" and not selected_allergies:
         errors.append("At least one allergy must be selected.")
 
     if errors:
-        for err in errors:
-            st.error(err)
+        for e in errors:
+            st.error(e)
     else:
-        user_input = {
-            "gender": gender,
-            "species": species,
-            "breed": breed,
-            "breed_size": breed_size,
-            "life_stage": life_stage,
-            "activity_level": activity_level,
-            "weight": weight,
-            "age": age,
-            "body_score": body_score,
-            "main_issue": main_issue,
-            "other_issues": [oi for oi in [other_issue_1, other_issue_2] if oi != "-- None --"],
-            "allergies": selected_allergies,
-            "pregnant": pregnant,
-            "lactating": lactating,
-        }
-
-        # Mock recommendations
         st.markdown("### 🍽️ Recommended Foods:")
         for food in [
             "Hill's Metabolic + Mobility",
