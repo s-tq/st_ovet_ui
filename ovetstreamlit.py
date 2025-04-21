@@ -122,23 +122,25 @@ with st.form("pet_form"):
     age = st.number_input("Age (months)", min_value=0, step=1, value=0)
     body_score = st.slider("Body Score (1-9)", min_value=1, max_value=9, step=1)
 
-    # Health Conditions
+    # Health Conditions with no repeats
     st.subheader("Health Conditions")
     main_issue = st.selectbox("Main Health Issue", ["None"] + health_issues)
-        # Filter out the main issue from other options
-    other_issues_options = ["None"] + [issue for issue in health_issues if issue != main_issue]
-    
+    # Exclude main from other options
+    other_options = [issue for issue in health_issues if issue != main_issue]
     col1, col2 = st.columns(2)
     with col1:
-        other_issue_1 = st.selectbox("Other Health Issue 1", other_issues_options)
-    
-    # Further filter options for other_issue_2 based on both main_issue and other_issue_1
-    other_issues_options_2 = ["None"] + [issue for issue in health_issues 
-                                        if issue != main_issue and 
-                                        (other_issue_1 == "None" or issue != other_issue_1)]
-    
+        other_issue_1 = st.selectbox(
+            "Other Health Issue 1",
+            ["None"] + other_options
+        )
+    # Exclude main and other_issue_1
+    other_options_2 = [issue for issue in health_issues
+                       if issue != main_issue and issue != other_issue_1]
     with col2:
-        other_issue_2 = st.selectbox("Other Health Issue 2", other_issues_options_2)
+        other_issue_2 = st.selectbox(
+            "Other Health Issue 2",
+            ["None"] + other_options_2
+        )
 
     # Allergies
     has_allergy = st.radio("Allergies", options=["Yes", "No"], index=None)
@@ -171,6 +173,11 @@ if submit:
         errors.append("Please select an activity level.")
     if main_issue == "None":
         errors.append("Please select a main health issue or choose 'None'.")
+    # Validate no repeats
+    if other_issue_1 != "None" and other_issue_1 == main_issue:
+        errors.append("Other Health Issue 1 cannot match the main health issue.")
+    if other_issue_2 != "None" and other_issue_2 == main_issue:
+        errors.append("Other Health Issue 2 cannot match the main health issue.")
     if other_issue_1 != "None" and other_issue_2 != "None" and other_issue_1 == other_issue_2:
         errors.append("Other Health Issue 1 and 2 must be different.")
 
