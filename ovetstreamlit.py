@@ -106,29 +106,39 @@ st.title("🐾 Pet Nutrition Recommendation Tool")
 # Custom CSS for scrollbar and error styling
 st.markdown("""
     <style>
-    /* Scrollbar styling */
+    /* Global vertical scrollbar styling for page */
+    html, body {
+        overflow-y: scroll;
+    }
+    /* Wider scrollbar track and thumb */
     ::-webkit-scrollbar {
-        width: 12px;
+        width: 16px;
     }
     ::-webkit-scrollbar-track {
         background: #f1f1f1;
     }
     ::-webkit-scrollbar-thumb {
         background: #888;
-        border-radius: 6px;
+        border-radius: 8px;
+        border: 3px solid #f1f1f1;
     }
     ::-webkit-scrollbar-thumb:hover {
         background: #555;
     }
 
-    /* Error message styling */
-    .stError {
-        background-color: #f8d7da !important;
-        color: #721c24 !important;
-        border: 1px solid #f5c6cb !important;
-        border-radius: 5px;
-        padding: 10px;
-        margin-bottom: 10px;
+    /* Alert box styling for Streamlit errors */
+    div[role="alert"] {
+        background-color: #ffe6e6 !important;
+        border-left: 4px solid #ff4d4d !important;
+        padding: 12px 16px !important;
+        margin-bottom: 8px !important;
+        border-radius: 4px !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    /* Error message text color */
+    div[role="alert"] p {
+        color: #800000 !important;
+        margin: 0;
     }
     </style>
 """, unsafe_allow_html=True)
