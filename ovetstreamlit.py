@@ -125,11 +125,20 @@ with st.form("pet_form"):
     # Health Conditions
     st.subheader("Health Conditions")
     main_issue = st.selectbox("Main Health Issue", ["None"] + health_issues)
+        # Filter out the main issue from other options
+    other_issues_options = ["None"] + [issue for issue in health_issues if issue != main_issue]
+    
     col1, col2 = st.columns(2)
     with col1:
-        other_issue_1 = st.selectbox("Other Health Issue 1", ["None"] + health_issues)
+        other_issue_1 = st.selectbox("Other Health Issue 1", other_issues_options)
+    
+    # Further filter options for other_issue_2 based on both main_issue and other_issue_1
+    other_issues_options_2 = ["None"] + [issue for issue in health_issues 
+                                        if issue != main_issue and 
+                                        (other_issue_1 == "None" or issue != other_issue_1)]
+    
     with col2:
-        other_issue_2 = st.selectbox("Other Health Issue 2", ["None"] + health_issues)
+        other_issue_2 = st.selectbox("Other Health Issue 2", other_issues_options_2)
 
     # Allergies
     has_allergy = st.radio("Allergies", options=["Yes", "No"], index=None)
